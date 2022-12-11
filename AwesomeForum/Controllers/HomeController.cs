@@ -83,8 +83,17 @@ namespace AwesomeForum.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult Error(int? statusCode = null)
         {
+            if (statusCode.HasValue)
+            {
+                if (statusCode == 404)
+                {
+                    var viewName = statusCode.ToString();
+                    return View(viewName);
+                }
+            }
+
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
