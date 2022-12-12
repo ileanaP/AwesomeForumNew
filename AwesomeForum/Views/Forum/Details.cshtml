@@ -1,0 +1,42 @@
+﻿@model Forum
+@{
+    ViewData["Title"] = Model.Name + " - Forum";
+    string[] btnNewParams = { "Topic", Model.Id.ToString() };
+}
+@await Html.PartialAsync("_AddNewButton", btnNewParams)
+<div class="row container-content">
+    <div class="col col-md-6 offset-3">
+        <h1 class="text-info">This forum has no topics yet</h1>
+        <hr />
+    </div>
+
+    <div class="col-md-10 offset-1">
+        <div class="bs-component">
+            <table class="table listing-table">
+
+                <thead>
+                    <tr>
+                        <th>@Model.Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var topic in @Model.Topics)
+                    {
+                        <tr>
+                            <td>
+                                <span>
+                                    <a asp-controller="Topic" asp-action="Details" asp-route-id="@topic.Id">@topic.Name</a>
+                                </span>
+                                <span style ="float:right;font-size:x-small">
+                                    <i>Created by:</i> <a asp-controller="Account" asp-action="Profile" asp-route-id="@topic.CreatorId">@topic.Creator</a> <i>Last posted:</i> @topic.LastPosted
+                                </span>
+                                <div style="clear:both;"></div> 
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>

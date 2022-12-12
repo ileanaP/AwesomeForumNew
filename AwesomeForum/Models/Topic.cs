@@ -7,7 +7,6 @@ namespace AwesomeForum.Models
     {
         public Topic()
         {
-            Active = true;
             MessageCount = 1;
         }
         public int Id { get; set; }
@@ -18,7 +17,6 @@ namespace AwesomeForum.Models
         public int ForumId { get; set; }
         [ForeignKey(nameof(ForumId))]
         public Forum Forum { get; set; }
-        public bool Active { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime LastPosted { get; set; }
         public int MessageCount { get; set; }

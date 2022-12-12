@@ -33,6 +33,11 @@ namespace AwesomeForum.Controllers
         {
             return View();
         }
+        [HttpGet]
+        public IActionResult Profile(int id)
+        {
+            return View();
+        }
 
         [HttpPost]
         public IActionResult Register(RegisterVM newRegister)
@@ -43,6 +48,24 @@ namespace AwesomeForum.Controllers
             }
 
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult Logout()
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult ChangePassword(RegisterVM registerVM)
+        {
+            return RedirectToAction("Index", "Account");
         }
     }
 }

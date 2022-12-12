@@ -86,6 +86,15 @@ body {
     background-color: #3bd1b3;
 }
 
+.forum-categories td {
+    background-color: #19A4E1;
+    color: #196EE1;
+}
+
+.forum-categories td:hover {
+    background-color: #4BB4E3;
+}
+
 .listing-table td a {
     text-decoration: none;
     color: #53504b;
@@ -121,4 +130,10 @@ navbar .nav-link:hover {
 
 .container-content {
     margin-top: 50px;
+}
+
+.topic-message {
+    margin-bottom:30px;
+    background: #eee;
+    box-shadow: 0 8px 8px -4px lightblue;
 }
