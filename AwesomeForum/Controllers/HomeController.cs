@@ -1,5 +1,6 @@
 ﻿using AwesomeForum.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Security.Cryptography.Xml;
@@ -9,71 +10,140 @@ namespace AwesomeForum.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly string _apiUrl;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _apiUrl = configuration.GetValue<string>("ApiUrl");
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            List<Category> categories = new List<Category>
+            List<Category> categories = new List<Category>();
+            using (var httpClient = new HttpClient())
             {
-                new Category
+                using (var response = await httpClient.GetAsync(_apiUrl + ""))
                 {
-                    Id = 1,
-                    Name = "Administrative",
-                    OrderNr = 0,
-                    Forums = new List<Forum> {
-                    new Forum {
-                        Id = 1,
-                        Name = "Rules & announcements",
-                        TopicCount = 3,
-                        OrderNr = 0,
-                        CategoryId = 1
-                    },
-                    new Forum {
-                        Id = 2,
-                        Name = "Welcome",
-                        TopicCount = 17,
-                        OrderNr = 1,
-                        CategoryId = 1
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    if (apiResponse != null)
+                    {
+                        categories = JsonConvert.DeserializeObject<List<Category>>(apiResponse);
+                    }
+                    else
+                    {
+                        categories = new List<Category>
+                        {
+                            new Category
+                            {
+                                Id = 1,
+                                Name = "Administrative",
+                                OrderNr = 0,
+                                Forums = new List<Forum> {
+                                new Forum {
+                                    Id = 1,
+                                    Name = "Rules & announcements",
+                                    TopicCount = 3,
+                                    OrderNr = 0,
+                                    CategoryId = 1
+                                },
+                                new Forum {
+                                    Id = 2,
+                                    Name = "Welcome",
+                                    TopicCount = 17,
+                                    OrderNr = 1,
+                                    CategoryId = 1
+                                }
+                            }
+                            },
+                            new Category
+                            {
+                                Id = 2,
+                                Name = "IT Talks",
+                                OrderNr = 1,
+                                Forums = new List<Forum> {
+                                new Forum {
+                                    Id = 3,
+                                    Name = "Software",
+                                    TopicCount = 28,
+                                    OrderNr = 0,
+                                    CategoryId = 1
+                                },
+                                new Forum {
+                                    Id = 4,
+                                    Name = "Hardware",
+                                    TopicCount = 5,
+                                    OrderNr = 1,
+                                    CategoryId = 1
+                                },
+                                new Forum {
+                                    Id = 5,
+                                    Name = "DevOps",
+                                    TopicCount = 67,
+                                    OrderNr = 1,
+                                    CategoryId = 1
+                                }
+                            }
+                            }
+
+                        };
                     }
                 }
-                },
-                new Category
-                {
-                    Id = 2,
-                    Name = "IT Talks",
-                    OrderNr = 1,
-                    Forums = new List<Forum> {
-                    new Forum {
-                        Id = 3,
-                        Name = "Software",
-                        TopicCount = 28,
-                        OrderNr = 0,
-                        CategoryId = 1
-                    },
-                    new Forum {
-                        Id = 4,
-                        Name = "Hardware",
-                        TopicCount = 5,
-                        OrderNr = 1,
-                        CategoryId = 1
-                    },
-                    new Forum {
-                        Id = 5,
-                        Name = "DevOps",
-                        TopicCount = 67,
-                        OrderNr = 1,
-                        CategoryId = 1
-                    }
-                }
-                }
-
-            };
-
-            // categories will be fetched from the back end
+            }
+            /*var categories = new List<Category>
+                        {
+                            new Category
+                            {
+                                Id = 1,
+                                Name = "Administrative",
+                                OrderNr = 0,
+                                Forums = new List<Forum> {
+                                new Forum {
+                                    Id = 1,
+                                    Name = "Rules & announcements",
+                                    TopicCount = 3,
+                                    OrderNr = 0,
+                                    CategoryId = 1
+                                },
+                                new Forum {
+                                    Id = 2,
+                                    Name = "Welcome",
+                                    TopicCount = 17,
+                                    OrderNr = 1,
+                                    CategoryId = 1
+                                }
+                            }
+                            },
+                            new Category
+                            {
+                                Id = 2,
+                                Name = "IT Talks",
+                                OrderNr = 1,
+                                Forums = new List<Forum> {
+                                new Forum {
+                                    Id = 3,
+                                    Name = "Software",
+                                    TopicCount = 28,
+                                    OrderNr = 0,
+                                    CategoryId = 1
+                                },
+                                new Forum {
+                                    Id = 4,
+                                    Name = "Hardware",
+                                    TopicCount = 5,
+                                    OrderNr = 1,
+                                    CategoryId = 1
+                                },
+                                new Forum {
+                                    Id = 5,
+                                    Name = "DevOps",
+                                    TopicCount = 67,
+                                    OrderNr = 1,
+                                    CategoryId = 1
+                                }
+                            }
+                            }
+            };*/
             return View(categories);
         }
 

@@ -1,4 +1,5 @@
-﻿<div class="row container-content">
+﻿@model AppUser
+<div class="row container-content">
     <div class="col col-md-6 offset-3">
         <table>
             <tr>
@@ -6,7 +7,7 @@
                     <div class="text-info"><i>Username:</i></div>
                 </td>
                 <td>
-                    Copilul
+                    @Model.UserName
                 </td>
             </tr>
             <tr>
@@ -14,12 +15,12 @@
                     <div class="text-info"><i>Nr Mesaje:</i></div>
                 </td>
                 <td>
-                    77
+                    @Model.NrOfMessages
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <a asp-controller="Forum" asp-action="UserTopics" asp-route-id="55" class="text-info">Lista topicuri</a>
+                    <a asp-controller="Forum" asp-action="UserTopics" asp-route-id="@Model.Id" class="text-info">Lista topicuri</a>
                 </td>
             </tr>
         </table>

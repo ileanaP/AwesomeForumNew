@@ -2,30 +2,62 @@
 using AwesomeForum.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 using System.Security.Claims;
+using System.Text;
 
 namespace AwesomeForum.Controllers
 {
     public class TopicController : Controller
     {
+        private readonly string _apiUrl;
+        public TopicController(IConfiguration configuration)
+        {
+            _apiUrl = configuration.GetValue<string>("ApiUrl");
+        }
         public IActionResult Details(int id = 7)
         {
             return View();
         }
 
         [HttpGet]
-        public IActionResult Create(int id)
+        public async Task<IActionResult> Create(int id)
         {
-            var forums = new List<Forum>();
-            forums.Add(new Forum {
-                Id = 1,
-                Name = "Forum 1"
-            });
-            forums.Add(new Forum
+            List<Forum> forums = null;
+
+            using (var httpClient = new HttpClient())
             {
-                Id = 2,
-                Name = "Forum 2"
-            });
+                using (var response = await httpClient.GetAsync(_apiUrl + ""))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+
+                    if (apiResponse != null)
+                    {
+                        forums = JsonConvert.DeserializeObject<List<Forum>>(apiResponse);
+                    }
+                }
+            }
+
+            if (forums == null)
+            {
+                forums = new List<Forum>
+                {
+                    new Forum {
+                        Id = 1,
+                        Name = "Rules & announcements",
+                        TopicCount = 3,
+                        OrderNr = 0,
+                        CategoryId = 1
+                    },
+                    new Forum {
+                        Id = 2,
+                        Name = "Welcome",
+                        TopicCount = 17,
+                        OrderNr = 1,
+                        CategoryId = 1
+                    }
+                };
+            }
 
             ViewBag.Forums = new SelectList(forums, "Id", "Name", id.ToString());
 
@@ -33,9 +65,20 @@ namespace AwesomeForum.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(NewTopicVM newTopic)
+        public async Task<IActionResult> Create(NewTopicVM newTopic)
         {
-            return RedirectToAction("Details", "Forum");
+            Topic topic = new Topic();
+            using (var httpClient = new HttpClient())
+            {
+                StringContent content = new StringContent(JsonConvert.SerializeObject(newTopic), Encoding.UTF8, "application/json");
+
+                using (var response = await httpClient.PostAsync(_apiUrl, content))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    topic = JsonConvert.DeserializeObject<Topic>(apiResponse);
+                }
+            }
+            return RedirectToAction("Details", "Topic", topic.Id);
         }
     }
 }

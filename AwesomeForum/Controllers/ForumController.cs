@@ -1,6 +1,7 @@
 ﻿using AwesomeForum.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Reflection;
 using System.Xml.Linq;
@@ -9,14 +10,35 @@ namespace AwesomeForum.Controllers
 {
     public class ForumController : Controller
     {
-        public IActionResult Details(int id = 7)
+        private readonly string _apiUrl;
+
+        public ForumController(IConfiguration configuration) 
         {
-            var forum = new Forum
+            _apiUrl = configuration.GetValue<string>("ApiUrl");
+        }
+        public async Task<IActionResult> Details(int id = 7)
+        {
+            Forum forum = null;
+            using (var httpClient = new HttpClient())
             {
-                Id = 1,
-                Name = "Software",
-                TopicCount = 2,
-                Topics = new List<Topic>
+                using (var response = await httpClient.GetAsync(_apiUrl + ""))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+
+                    if (apiResponse != null)
+                    {
+                        forum = JsonConvert.DeserializeObject<Forum>(apiResponse);
+                    }
+                }
+            }
+            if (forum == null)
+            {
+                forum = new Forum
+                {
+                    Id = 1,
+                    Name = "Software",
+                    TopicCount = 2,
+                    Topics = new List<Topic>
                 {
                     new Topic
                     {
@@ -45,34 +67,50 @@ namespace AwesomeForum.Controllers
                         MessageCount = 10
                     }
                 }
-            };
-
+                };
+            }
             return View(forum);
         }
 
-        public IActionResult UserTopics(int id)
+        public async Task<IActionResult> UserTopics(int id)
         {
-            var forum = new Forum
+            Forum forum = null;
+            using (var httpClient = new HttpClient())
             {
-                Name = "Topicurile userului Copilul",
-                TopicCount = 1,
-                Topics = new List<Topic>
+                using (var response = await httpClient.GetAsync(_apiUrl + ""))
                 {
-                    new Topic
-                    {
-                        Name = "All about React",
-                        Creator = new AppUser
-                        {
-                            UserName = "Copilul"
-                        },
-                        CreatorId = "7",
-                        DateCreated = DateTime.Now.AddDays(-10),
-                        LastPosted = DateTime.Now.AddDays(-3).AddMinutes(87),
-                        MessageCount = 3
+                    string apiResponse = await response.Content.ReadAsStringAsync();
 
+                    if (apiResponse != null)
+                    {
+                        forum = JsonConvert.DeserializeObject<Forum>(apiResponse);
                     }
                 }
-            };
+            }
+            if (forum == null)
+            {
+                forum = new Forum
+                {
+                    Name = "Topicurile userului Copilul",
+                    TopicCount = 1,
+                    Topics = new List<Topic>
+                    {
+                        new Topic
+                        {
+                            Name = "All about React",
+                            Creator = new AppUser
+                            {
+                                UserName = "Copilul"
+                            },
+                            CreatorId = "7",
+                            DateCreated = DateTime.Now.AddDays(-10),
+                            LastPosted = DateTime.Now.AddDays(-3).AddMinutes(87),
+                            MessageCount = 3
+
+                        }
+                    }
+                };
+            }
 
             return View("Details", forum);
         }

@@ -30,18 +30,24 @@
                         </li>
                     </ul>
                     <ul class="navbar-nav float-right">
+                        @if (!User.Identity.IsAuthenticated)
+                        {
                             <li class="nav-item float-right">
                                 <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Log In</a>
                             </li>
                             <li class="nav-item float-right">
                                 <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
                             </li>
+                        }
+                        else
+                        {
                             <li class="nav-item float-right">
                                 <a class="nav-link" asp-action="Index" asp-controller="Account"><strong>My Account</strong></a>
                             </li>
                             <li class="nav-item float-right">
                                 <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Logout">Log Out</a>
                             </li>
+                        }
                     </ul>
                 </div>
             </div>
