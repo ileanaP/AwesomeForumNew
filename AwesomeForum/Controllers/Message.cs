@@ -30,7 +30,7 @@ namespace AwesomeForum.Controllers
         {
             _userService.SetHttpContextUser(Request, HttpContext);
 
-            Topic topic = new Topic();
+            Topic topic = null;
             using (var httpClient = new HttpClient())
             {
                 StringContent content = new StringContent(JsonConvert.SerializeObject(newTopic), Encoding.UTF8, "application/json");
@@ -38,10 +38,13 @@ namespace AwesomeForum.Controllers
                 using (var response = await httpClient.PostAsync(_apiUrl, content))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
-                    topic = JsonConvert.DeserializeObject<Topic>(apiResponse);
+                    if (apiResponse != null)
+                    {
+                        topic = JsonConvert.DeserializeObject<Topic>(apiResponse);
+                    }
                 }
             }
-            return RedirectToAction("Details", "Topic", topic.Id);
+            return RedirectToAction("Details", "Topic", topic.id);
         }
     }
 }

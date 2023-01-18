@@ -4,7 +4,7 @@
     {
         public interface IModelBase
         {
-            public int Id { get; set; }
+            public int id { get; set; }
         }
     }
 }

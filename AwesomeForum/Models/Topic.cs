@@ -7,18 +7,18 @@ namespace AwesomeForum.Models
     {
         public Topic()
         {
-            MessageCount = 1;
+            messageCount = 1;
         }
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string CreatorId { get; set; }
-        [ForeignKey(nameof(CreatorId))]
-        public AppUser Creator { get; set; }
-        public int ForumId { get; set; }
-        [ForeignKey(nameof(ForumId))]
-        public Forum Forum { get; set; }
-        public DateTime DateCreated { get; set; }
-        public DateTime LastPosted { get; set; }
-        public int MessageCount { get; set; }
+        public int id { get; set; }
+        public string name { get; set; }
+        public string creatorId { get; set; }
+        [ForeignKey(nameof(creatorId))]
+        public AppUser creator { get; set; }
+        public int forumId { get; set; }
+        [ForeignKey(nameof(forumId))]
+        public Forum forum { get; set; }
+        public DateTime dateCreated { get; set; }
+        public DateTime lastPosted { get; set; }
+        public int messageCount { get; set; }
     }
 }

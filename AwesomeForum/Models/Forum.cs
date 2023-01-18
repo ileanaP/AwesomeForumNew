@@ -5,13 +5,13 @@ namespace AwesomeForum.Models
 {
     public class Forum : IModelBase
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public int TopicCount { get; set; }
-        public List<Topic> Topics { get; set; }
-        public int OrderNr { get; set; }
-        public int CategoryId { get; set; }
-        [ForeignKey(nameof(CategoryId))]
-        public Category Category { get; set; }
+        public int id { get; set; }
+        public string name { get; set; }
+        public int topicCount { get; set; }
+        public List<Topic> topics { get; set; }
+        public int orderNr { get; set; }
+        public int categoryId { get; set; }
+        [ForeignKey(nameof(categoryId))]
+        public Category category { get; set; }
     }
 }

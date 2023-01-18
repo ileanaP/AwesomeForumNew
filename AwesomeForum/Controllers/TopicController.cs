@@ -50,18 +50,18 @@ namespace AwesomeForum.Controllers
                 forums = new List<Forum>
                 {
                     new Forum {
-                        Id = 1,
-                        Name = "Rules & announcements",
-                        TopicCount = 3,
-                        OrderNr = 0,
-                        CategoryId = 1
+                        id = 1,
+                        name = "Rules & announcements",
+                        topicCount = 3,
+                        orderNr = 0,
+                        categoryId = 1
                     },
                     new Forum {
-                        Id = 2,
-                        Name = "Welcome",
-                        TopicCount = 17,
-                        OrderNr = 1,
-                        CategoryId = 1
+                        id = 2,
+                        name = "Welcome",
+                        topicCount = 17,
+                        orderNr = 1,
+                        categoryId = 1
                     }
                 };
             }
@@ -76,7 +76,7 @@ namespace AwesomeForum.Controllers
         {
             _userService.SetHttpContextUser(Request, HttpContext);
 
-            Topic topic = new Topic();
+            Topic topic = null;
             using (var httpClient = new HttpClient())
             {
                 StringContent content = new StringContent(JsonConvert.SerializeObject(newTopic), Encoding.UTF8, "application/json");
@@ -84,10 +84,13 @@ namespace AwesomeForum.Controllers
                 using (var response = await httpClient.PostAsync(_apiUrl, content))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
-                    topic = JsonConvert.DeserializeObject<Topic>(apiResponse);
+                    if (apiResponse != null)
+                    {
+                        topic = JsonConvert.DeserializeObject<Topic>(apiResponse);
+                    }
                 }
             }
-            return RedirectToAction("Details", "Topic", topic.Id);
+            return RedirectToAction("Details", "Topic", topic.id);
         }
     }
 }

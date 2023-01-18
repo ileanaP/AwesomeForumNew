@@ -29,8 +29,7 @@ namespace AwesomeForum.Controllers
             List<Category> categories = new List<Category>();
             using (var httpClient = new HttpClient())
             {
-                //using (var response = await httpClient.GetAsync(_apiUrl + "/categories"))
-                using (var response = await httpClient.GetAsync("https://catfact.ninja/fact"))
+                using (var response = await httpClient.GetAsync(_apiUrl + "/categories"))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
                     apiResponse = "[{\"id\":1,\"name\":\"cat1\",\"orderNr\":1,\"forums\":[{\"id\":1,\"name\":\"for1\",\"orderNr\":1,\"categoryId\":1},{\"id\":2,\"name\":\"for2\",\"orderNr\":2,\"categoryId\":1}]},{\"id\":2,\"name\":\"cat2\",\"orderNr\":2,\"forums\":[{\"id\":3,\"name\":\"for3\",\"orderNr\":3,\"categoryId\":2},{\"id\":4,\"name\":\"for4\",\"orderNr\":4,\"categoryId\":2}]}]";
@@ -44,52 +43,52 @@ namespace AwesomeForum.Controllers
                         {
                             new Category
                             {
-                                Id = 1,
-                                Name = "Administrative",
-                                OrderNr = 0,
-                                Forums = new List<Forum> {
+                                id = 1,
+                                name = "Administrative",
+                                orderNr = 0,
+                                forums = new List<Forum> {
                                 new Forum {
-                                    Id = 1,
-                                    Name = "Rules & announcements",
-                                    TopicCount = 3,
-                                    OrderNr = 0,
-                                    CategoryId = 1
+                                    id = 1,
+                                    name = "Rules & announcements",
+                                    topicCount = 3,
+                                    orderNr = 0,
+                                    categoryId = 1
                                 },
                                 new Forum {
-                                    Id = 2,
-                                    Name = "Welcome",
-                                    TopicCount = 17,
-                                    OrderNr = 1,
-                                    CategoryId = 1
+                                    id = 2,
+                                    name = "Welcome",
+                                    topicCount = 17,
+                                    orderNr = 1,
+                                    categoryId = 1
                                 }
                             }
                             },
                             new Category
                             {
-                                Id = 2,
-                                Name = "IT Talks",
-                                OrderNr = 1,
-                                Forums = new List<Forum> {
+                                id = 2,
+                                name = "IT Talks",
+                                orderNr = 1,
+                                forums = new List<Forum> {
                                 new Forum {
-                                    Id = 3,
-                                    Name = "Software",
-                                    TopicCount = 28,
-                                    OrderNr = 0,
-                                    CategoryId = 1
+                                    id = 3,
+                                    name = "Software",
+                                    topicCount = 28,
+                                    orderNr = 0,
+                                    categoryId = 1
                                 },
                                 new Forum {
-                                    Id = 4,
-                                    Name = "Hardware",
-                                    TopicCount = 5,
-                                    OrderNr = 1,
-                                    CategoryId = 1
+                                    id = 4,
+                                    name = "Hardware",
+                                    topicCount = 5,
+                                    orderNr = 1,
+                                    categoryId = 1
                                 },
                                 new Forum {
-                                    Id = 5,
-                                    Name = "DevOps",
-                                    TopicCount = 67,
-                                    OrderNr = 1,
-                                    CategoryId = 1
+                                    id = 5,
+                                    name = "DevOps",
+                                    topicCount = 67,
+                                    orderNr = 1,
+                                    categoryId = 1
                                 }
                             }
                             }

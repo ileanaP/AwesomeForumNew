@@ -5,15 +5,15 @@ namespace AwesomeForum.Models
 {
     public class User_Reaction : IModelBase
     {
-        public int Id { get; set; }
-        public int MessageId { get; set; }
-        [ForeignKey(nameof(MessageId))]
-        public TopicMessage TopicMessage { get; set; }
-        public int ReactionId { get; set; }
-        [ForeignKey(nameof(ReactionId))]
-        public Reaction Reaction { get; set; }
-        public string UserId { get; set; }
-        [ForeignKey(nameof(UserId))]
-        public AppUser User { get; set; }
+        public int id { get; set; }
+        public int messageId { get; set; }
+        [ForeignKey(nameof(messageId))]
+        public TopicMessage topicMessage { get; set; }
+        public int reactionId { get; set; }
+        [ForeignKey(nameof(reactionId))]
+        public Reaction reaction { get; set; }
+        public string userId { get; set; }
+        [ForeignKey(nameof(userId))]
+        public AppUser user { get; set; }
     }
 }

@@ -4,10 +4,10 @@ namespace AwesomeForum.Models
 {
     public class Category : IModelBase
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public int OrderNr { get; set; }
-        public List<Forum> Forums { get; set; }
-        public List<Message_Reaction> Message_Reactions { get; set; }
+        public int id { get; set; }
+        public string name { get; set; }
+        public int orderNr { get; set; }
+        public List<Forum> forums { get; set; }
+        public List<Message_Reaction> message_reactions { get; set; }
     }
 }

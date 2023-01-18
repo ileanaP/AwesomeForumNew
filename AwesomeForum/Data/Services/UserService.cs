@@ -9,10 +9,10 @@ namespace AwesomeForum.Data.Services
         {
             var user = new AppUser
             {
-                Id = request.Cookies["Id"],
+                Id = request.Cookies["UserId"],
                 UserName = request.Cookies["UserName"],
-                NrOfMessages = Convert.ToInt32(request.Cookies["UserNrOfMessages"]),
-                NrOfTopics = Convert.ToInt32(request.Cookies["UserNrOfTopics"])
+                nrOfMessages = Convert.ToInt32(request.Cookies["UserNrOfMessages"]),
+                nrOfTopics = Convert.ToInt32(request.Cookies["UserNrOfTopics"])
             };
 
             return user;
@@ -55,8 +55,8 @@ namespace AwesomeForum.Data.Services
         {
             response.Cookies.Append("UserName", user.UserName);
             response.Cookies.Append("UserId", user.Id);
-            response.Cookies.Append("UserNrOfMessages", user.NrOfMessages.ToString());
-            response.Cookies.Append("UserNrOfTopics", user.NrOfTopics.ToString());
+            response.Cookies.Append("UserNrOfMessages", user.nrOfMessages.ToString());
+            response.Cookies.Append("UserNrOfTopics", user.nrOfTopics.ToString());
         }
     }
 }

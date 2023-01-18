@@ -29,10 +29,9 @@ namespace AwesomeForum.Controllers
 
             _userService.SetHttpContextUser(Request, HttpContext);
 
-
             AppUser user = _userService.GetLoggedInUser(Request);
-            //return View(user);
-            return View(new AppUser());
+            
+            return View(user);
         }
 
         [HttpGet]
@@ -53,16 +52,31 @@ namespace AwesomeForum.Controllers
                 return View(newLogin);
             }
 
+            AppUser user = null;
             using (var httpClient = new HttpClient())
             {
-                var tmp1 = new { username = newLogin.EmailOrUsername, password = newLogin.Password };
-                StringContent content = new StringContent(JsonConvert.SerializeObject(tmp1), Encoding.UTF8, "application/json");
+                //var tmp1 = new { username = newLogin.EmailOrUsername, password = newLogin.Password };
+                //StringContent content = new StringContent(JsonConvert.SerializeObject(tmp1), Encoding.UTF8, "application/json");
 
-                using (var response = await httpClient.PostAsync(_apiUrl + "/login", content))
+                var urlExtention = "/user/login?username=" + newLogin.EmailOrUsername + "&password=" + newLogin.Password;
+                //using (var response = await httpClient.PostAsync(_apiUrl + "/login", content))
+                using (var response = await httpClient.PostAsync(_apiUrl + urlExtention, null))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
                     apiResponse = "{\"id\":2,\"username\":\"ileana\",\"password\":\"qwerty\",\"email\":\"ileana@gmail.com\",\"nrOfMessages\":0,\"nrOfTopics\":0}";
-                    var user = JsonConvert.DeserializeObject<AppUser>(apiResponse);
+                    if (apiResponse != null)
+                    {
+                        user = JsonConvert.DeserializeObject<AppUser>(apiResponse);
+                    }
+                    else
+                    {
+                        return RedirectToAction("Login", "Account");
+                    }
+
+                    if (user == null)
+                    {
+                        return RedirectToAction("Login", "Account");
+                    }
 
                     _userService.SetUserLoginCookie(Response, user);
                 }
@@ -86,10 +100,11 @@ namespace AwesomeForum.Controllers
             AppUser user = null;
             using (var httpClient = new HttpClient())
             {
-                using (var response = await httpClient.GetAsync(_apiUrl + ""))
+                var urlExtention = "/user?id=" + id.ToString();
+                using (var response = await httpClient.GetAsync(_apiUrl + urlExtention))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
-
+                    apiResponse = "{\"id\":2,\"username\":\"ileana\",\"password\":\"qwerty\",\"email\":\"ileana@gmail.com\",\"nrOfMessages\":7,\"nrOfTopics\":88}";
                     if (apiResponse != null)
                     {
                         user = JsonConvert.DeserializeObject<AppUser>(apiResponse);
@@ -102,8 +117,9 @@ namespace AwesomeForum.Controllers
                 user = new AppUser
                 {
                     UserName = "Enrique",
-                    NrOfMessages = 100,
-                    NrOfTopics = 50
+                    Email = "enrique@enriqmail.com",
+                    nrOfMessages = 100,
+                    nrOfTopics = 50
                 };
             }
 
@@ -120,23 +136,32 @@ namespace AwesomeForum.Controllers
                 return View(newRegister);
             }
 
-            // AppUser user = new AppUser();
+            AppUser user = null;
             using (var httpClient = new HttpClient())
             {
-                var tmp1 = new
+                /*var tmp1 = new
                 {
                     email = newRegister.Email,
                     username = newRegister.Username,
                     password = newRegister.Password,
                     repeatPassword = newRegister.RepeatPassword
                 };
-                StringContent content = new StringContent(JsonConvert.SerializeObject(tmp1), Encoding.UTF8, "application/json");
+                StringContent content = new StringContent(JsonConvert.SerializeObject(tmp1), Encoding.UTF8, "application/json");*/
 
-                using (var response = await httpClient.PostAsync(_apiUrl + "", content))
+                var urlExtention = "/user/register?email=" + newRegister.Email + "&username=" + newRegister.Username + "&password=" + newRegister.Password + "&repeatPassword=" + newRegister.RepeatPassword;
+                //using (var response = await httpClient.PostAsync(_apiUrl + "/register", content))
+                using (var response = await httpClient.PostAsync(_apiUrl + urlExtention, null))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
-                    apiResponse = "{\"id\":2,\"username\":\"ileana\",\"password\":\"qwerty\",\"email\":\"ileana@gmail.com\",\"nrOfMessages\":0,\"nrOfTopics\":0}";
-                    var user = JsonConvert.DeserializeObject<AppUser>(apiResponse);
+                    apiResponse = "{\"id\":2,\"username\":\"ileana\",\"password\":\"qwerty\",\"email\":\"ileana@gmail.com\",\"nrOfMessages\":7,\"nrOfTopics\":0}";
+                    if (apiResponse != null)
+                    {
+                        user = JsonConvert.DeserializeObject<AppUser>(apiResponse);
+                    }
+                    else
+                    {
+                        RedirectToAction("Register", "Account");
+                    }
 
                     _userService.SetUserLoginCookie(Response, user);
                 }
@@ -163,6 +188,11 @@ namespace AwesomeForum.Controllers
         [HttpGet]
         public IActionResult ChangePassword()
         {
+            if (!_userService.UserLoggedIn(Request))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             _userService.SetHttpContextUser(Request, HttpContext);
 
             return View();
@@ -171,33 +201,38 @@ namespace AwesomeForum.Controllers
         [HttpPost]
         public async Task<IActionResult> ChangePassword(RegisterVM registerVM)
         {
+            if (!_userService.UserLoggedIn(Request))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             _userService.SetHttpContextUser(Request, HttpContext);
 
-            //AppUser user = await _userManager.GetUserAsync(principal: HttpContext.User);
-            AppUser user = new AppUser();
+            AppUser user = _userService.GetLoggedInUser(Request);
             using (var httpClient = new HttpClient())
             {
-                var tmp1 = new
+                /*var tmp1 = new
                 {
                     id = user.Id,
                     oldPassword = registerVM.Password,
                     newPassword = registerVM.RepeatPassword
                 };
-                StringContent content = new StringContent(JsonConvert.SerializeObject(tmp1), Encoding.UTF8, "application/json");
-
-                using (var response = await httpClient.PostAsync(_apiUrl + "", content))
+                StringContent content = new StringContent(JsonConvert.SerializeObject(tmp1), Encoding.UTF8, "application/json");*/
+                bool tmp = false;
+                var urlExtention = "/user/change-password?id=" + user.Id + "&oldPassword=" + registerVM.Password + "&newPassword=" + registerVM.RepeatPassword;
+                using (var response = await httpClient.PostAsync(_apiUrl + urlExtention, null))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
-                    var tmp = JsonConvert.DeserializeObject<bool>(apiResponse);
-
-                    user = new AppUser
+                    apiResponse = "true";
+                    if (apiResponse != null)
                     {
-                        NrOfMessages = 100,
-                        NrOfTopics = 50,
-                        UserName = "Bob"
-                    };
+                        tmp = JsonConvert.DeserializeObject<bool>(apiResponse);
+                    }
 
-                    
+                    if (!tmp)
+                    {
+                        return RedirectToAction("Index", "Home");
+                    }                    
                 }
             }
             return RedirectToAction("Index", "Account");
