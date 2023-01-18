@@ -1,34 +1,29 @@
-﻿@{
+﻿@using AwesomeForum.Data.ViewModels;
+@model TopicDetailsVM
+@{
     ViewData["Title"] = "Awesome Forum - Thread Name";
-    string[] btnNewParams = { "Message", "3" };
+    string[] btnNewParams = { "Message", Model.topic.id.ToString() };
 }
 @await Html.PartialAsync("_AddNewButton", btnNewParams)
 <div class="row container-content">
 
     <div class="col-md-10 offset-1">
         <div class="bs-component">
+            <div class="col col-md-6 offset-3">
+                <h3 class="text-info">Topic: @Model.topic.name</h3>
+                <hr />
+            </div>
+@foreach(var message in Model.topicMessages)
+{
             <div class="topic-message">
                 <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                    labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                    laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                    voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                    @message.messageText
                 </p>
                 <hr>
-                <div style="float:right;"><sup><i><a asp-action="Profile" asp-controller="Account" asp-route-id="7">Copilul</a>, @DateTime.Now</i></sup></div>
+                <div style="float:right;"><sup><i><a asp-action="Profile" asp-controller="Account" asp-route-id="@message.user.Id">@message.user.UserName</a>, @message.createdDate</i></sup></div>
                 <div style="clear:both;"></div>
             </div>
-            <div class="topic-message">
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                    labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                    laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-                    voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                </p>
-                <hr>
-                <div style="float:right;"><sup><i><a asp-action="Profile" asp-controller="Account" asp-route-id="7">Copilul</a>, @DateTime.Now</i></sup></div>
-                <div style="clear:both;"></div>
-            </div>
+}
         </div>
     </div>
 </div>
