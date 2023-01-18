@@ -194,7 +194,7 @@ namespace AwesomeForum.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        private TopicDetailsVM DecodeTopicAndMessages(string topicAndMessages)
+        public TopicDetailsVM DecodeTopicAndMessages(string topicAndMessages)
         {
             dynamic topicDetails = JsonConvert.DeserializeObject<dynamic>(topicAndMessages);
 
