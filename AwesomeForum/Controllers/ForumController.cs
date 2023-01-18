@@ -1,4 +1,5 @@
-﻿using AwesomeForum.Models;
+﻿using AwesomeForum.Data.Services;
+using AwesomeForum.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -11,6 +12,7 @@ namespace AwesomeForum.Controllers
     public class ForumController : Controller
     {
         private readonly string _apiUrl;
+        private UserService _userService = new UserService();
 
         public ForumController(IConfiguration configuration) 
         {
@@ -18,6 +20,8 @@ namespace AwesomeForum.Controllers
         }
         public async Task<IActionResult> Details(int id = 7)
         {
+            _userService.SetHttpContextUser(Request, HttpContext);
+
             Forum forum = null;
             using (var httpClient = new HttpClient())
             {
@@ -74,6 +78,8 @@ namespace AwesomeForum.Controllers
 
         public async Task<IActionResult> UserTopics(int id)
         {
+            _userService.SetHttpContextUser(Request, HttpContext);
+
             Forum forum = null;
             using (var httpClient = new HttpClient())
             {

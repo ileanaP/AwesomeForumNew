@@ -1,64 +1,70 @@
-﻿using AwesomeForum.Data.ViewModels;
+﻿using AwesomeForum.Data.Services;
+using AwesomeForum.Data.ViewModels;
 using AwesomeForum.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 
 namespace AwesomeForum.Controllers
 {
     public class AccountController : Controller
     {
-        private SignInManager<AppUser> _signInManager;
-        private UserManager<AppUser> _userManager;
         private readonly string _apiUrl;
+        private UserService _userService = new UserService();
 
-        public AccountController(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager)
+        public AccountController(IConfiguration configuration)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
+            _apiUrl = configuration.GetValue<string>("ApiUrl");
         }
 
         public async Task<IActionResult> Index()
         {
-            AppUser user = await _userManager.GetUserAsync(principal: HttpContext.User);
-            return View(user);
+            if (!_userService.UserLoggedIn(Request))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            _userService.SetHttpContextUser(Request, HttpContext);
+
+
+            AppUser user = _userService.GetLoggedInUser(Request);
+            //return View(user);
+            return View(new AppUser());
         }
 
         [HttpGet]
         public IActionResult Login()
         {
+            _userService.SetHttpContextUser(Request, HttpContext);
+
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginVM newLogin)
         {
+            _userService.SetHttpContextUser(Request, HttpContext);
+
             if (!ModelState.IsValid)
             {
                 return View(newLogin);
             }
 
-            // AppUser user = new AppUser();
             using (var httpClient = new HttpClient())
             {
                 var tmp1 = new { username = newLogin.EmailOrUsername, password = newLogin.Password };
                 StringContent content = new StringContent(JsonConvert.SerializeObject(tmp1), Encoding.UTF8, "application/json");
 
-                using (var response = await httpClient.PostAsync("https://localhost:44324/api/Reservation", content))
+                using (var response = await httpClient.PostAsync(_apiUrl + "/login", content))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
-                    var tmp = JsonConvert.DeserializeObject<AppUser>(apiResponse);
+                    apiResponse = "{\"id\":2,\"username\":\"ileana\",\"password\":\"qwerty\",\"email\":\"ileana@gmail.com\",\"nrOfMessages\":0,\"nrOfTopics\":0}";
+                    var user = JsonConvert.DeserializeObject<AppUser>(apiResponse);
 
-                    AppUser user = new AppUser
-                    {
-                        NrOfMessages = 100,
-                        NrOfTopics = 50,
-                        UserName = "Bob"
-                    };
-
-                    _signInManager.SignInAsync(user, true);
+                    _userService.SetUserLoginCookie(Response, user);
                 }
             }
 
@@ -68,11 +74,15 @@ namespace AwesomeForum.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            _userService.SetHttpContextUser(Request, HttpContext);
+
             return View();
         }
         [HttpGet]
         public async Task<IActionResult> Profile(int id)
         {
+            _userService.SetHttpContextUser(Request, HttpContext);
+
             AppUser user = null;
             using (var httpClient = new HttpClient())
             {
@@ -103,6 +113,8 @@ namespace AwesomeForum.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterVM newRegister)
         {
+            _userService.SetHttpContextUser(Request, HttpContext);
+
             if (!ModelState.IsValid)
             {
                 return View(newRegister);
@@ -123,16 +135,10 @@ namespace AwesomeForum.Controllers
                 using (var response = await httpClient.PostAsync(_apiUrl + "", content))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
-                    var tmp = JsonConvert.DeserializeObject<AppUser>(apiResponse);
+                    apiResponse = "{\"id\":2,\"username\":\"ileana\",\"password\":\"qwerty\",\"email\":\"ileana@gmail.com\",\"nrOfMessages\":0,\"nrOfTopics\":0}";
+                    var user = JsonConvert.DeserializeObject<AppUser>(apiResponse);
 
-                    AppUser user = new AppUser
-                    {
-                        NrOfMessages = 100,
-                        NrOfTopics = 50,
-                        UserName = "Bob"
-                    };
-
-                    _signInManager.SignInAsync(user, true);
+                    _userService.SetUserLoginCookie(Response, user);
                 }
             }
 
@@ -142,20 +148,33 @@ namespace AwesomeForum.Controllers
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            _userService.SetHttpContextUser(Request, HttpContext);
+
+            Response.Cookies.Delete("UserName");
+            Response.Cookies.Delete("UserId");
+            Response.Cookies.Delete("UserNrOfMessages");
+            Response.Cookies.Delete("UserNrOfTopics");
+
+            HttpContext.User = null;
+
             return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
         public IActionResult ChangePassword()
         {
+            _userService.SetHttpContextUser(Request, HttpContext);
+
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> ChangePassword(RegisterVM registerVM)
         {
-            AppUser user = await _userManager.GetUserAsync(principal: HttpContext.User);
+            _userService.SetHttpContextUser(Request, HttpContext);
+
+            //AppUser user = await _userManager.GetUserAsync(principal: HttpContext.User);
+            AppUser user = new AppUser();
             using (var httpClient = new HttpClient())
             {
                 var tmp1 = new
@@ -178,7 +197,7 @@ namespace AwesomeForum.Controllers
                         UserName = "Bob"
                     };
 
-                    _signInManager.SignInAsync(user, true);
+                    
                 }
             }
             return RedirectToAction("Index", "Account");

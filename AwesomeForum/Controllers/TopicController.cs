@@ -1,4 +1,5 @@
-﻿using AwesomeForum.Data.ViewModels;
+﻿using AwesomeForum.Data.Services;
+using AwesomeForum.Data.ViewModels;
 using AwesomeForum.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,18 +12,24 @@ namespace AwesomeForum.Controllers
     public class TopicController : Controller
     {
         private readonly string _apiUrl;
+        private UserService _userService = new UserService();
+
         public TopicController(IConfiguration configuration)
         {
             _apiUrl = configuration.GetValue<string>("ApiUrl");
         }
         public IActionResult Details(int id = 7)
         {
+            _userService.SetHttpContextUser(Request, HttpContext);
+
             return View();
         }
 
         [HttpGet]
         public async Task<IActionResult> Create(int id)
         {
+            _userService.SetHttpContextUser(Request, HttpContext);
+
             List<Forum> forums = null;
 
             using (var httpClient = new HttpClient())
@@ -67,6 +74,8 @@ namespace AwesomeForum.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(NewTopicVM newTopic)
         {
+            _userService.SetHttpContextUser(Request, HttpContext);
+
             Topic topic = new Topic();
             using (var httpClient = new HttpClient())
             {
